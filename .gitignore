@@ -1,0 +1,5 @@
+.vagrant
+Stockfish/src/.depend
+Stockfish/src/stockfish
+Stockfish/src/*.o
+Stockfish/src/syzygy/*.o
