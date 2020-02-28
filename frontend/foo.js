@@ -4,9 +4,12 @@ var boardDOM;
 var fishSocket;
 var fishQueue;
 var fishData;
+var fishDataDOM;
 var engineHistoryDOM;
 var pgnHistoryDOM;
 var fenDOM;
+var tooltipDOM;
+var focusedIdea;
 
 // for convenience, various lookup tables for squares
 // annoyingly, bitboards and square indexes are transposed
@@ -107,6 +110,7 @@ function FishQueue(socket) {
 
 function stockfishOnMessage(json) {
   fishData = json;
+  fishDataDOM.val(JSON.stringify(fishData, null, 1));
   // remove enpassant field, stockfish is stupid about setting it
   var remote_fen_array = fishData.fen.split(/ /);
   var local_fen_array = fenDOM.val().split(/ /);
@@ -123,7 +127,6 @@ function stockfishOnMessage(json) {
   onMouseoutSquare(undefined, undefined);
   console.log("remote position - " + fishData.fen);
 }
-
 
 function update(engine_moves, options = {}) {
   // sets the board state and position textarea inputs,
@@ -168,7 +171,7 @@ function onMouseoutSquare (square, piece) {
   boardDOM.find(".square-55d63").attr("data-highlight", "");
   boardDOM.find(".square-55d63").attr("data-color", "");
 
-  fishData.ideas.white[0].forEach(function(data, index) {
+  fishData.ideas.white[focusedIdea].forEach(function(data, index) {
     if (data.mg < 0) {
       square = index_to_square[index];
       boardDOM.find('.square-' + square).attr("data-color", "red");
@@ -177,17 +180,30 @@ function onMouseoutSquare (square, piece) {
       boardDOM.find('.square-' + square).attr("data-color", "green");
     }
   });
+
+  tooltipDOM.css("display", "none");
 }
 
 function onMouseoverSquare(square, piece) {
+  // highlight other squares
   index = square_to_index[square];
-  data = fishData.ideas.white[0][index];
+  data = fishData.ideas.white[focusedIdea][index];
   if (data.mg != 0) {
     boardDOM.find('.square-' + square).attr("data-color", "blue");
     bitboard_to_squares(data.why).forEach(function(square) {
       boardDOM.find('.square-' + square).attr("data-highlight", "red");
     });
   }
+
+  total_for_square = 0;
+  // can't do regular forEach, but apparently this works...
+  for (var idea in fishData.ideas.white) {
+    total_for_square += fishData.ideas.white[idea][index].mg;
+  }
+
+  // update tooltip text
+  tooltipDOM.css("display", "block");
+  tooltipDOM.html(`Score for ${square}<br>This idea: ${data.mg}<br>Total: ${total_for_square}`);
 }
 
 function onDrop(source, target, piece, newPos, oldPos, orientation) {
@@ -240,6 +256,25 @@ $(document).ready(function() {
   // initialize fen-formatted board state
   fenDOM = $("#fen-string");
   fenDOM.val(chess.fen());
+
+  // initialize tooltips
+  tooltipDOM = $("#tooltip");
+  $(document).mousemove(function(event) {
+    tooltipDOM.css("top", event.pageY + 20);
+    tooltipDOM.css("left", event.pageX + 20);
+  });
+
+  // initialize stockfish json display
+  fishDataDOM = $("#stockfish-json");
+
+  // initialize idea display
+  focusedIdea = 0;
+  $(".idea").click(function(event) {
+    $(".idea").attr("data-selected", "false");
+    $(event.delegateTarget).attr("data-selected", "true");
+    focusedIdea = $(event.delegateTarget).attr("data-idea");
+    onMouseoutSquare(undefined, undefined);
+  });
 
   // initialize stockfish websocket
   fishSocket = new WebSocket('ws://localhost:8080');

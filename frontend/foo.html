@@ -41,16 +41,42 @@
       .white-1e1d7[data-color=red] {
         background-color: #cf8080;
       }
+      .info-box {
+        width: 350px;
+        height: 400px;
+      }
+      .tooltip {
+        position: absolute;
+        display: none;
+        border: 1px solid black;
+        background: #d0d0d0;
+        z-index: 99;
+        padding: 5px;
+      }
+      .idea[data-selected=true] p {
+        display: block;
+      }
+      .idea p {
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <div id="board1" style="width: 400px" data-squares='{"b1": {"green": ["b1"], "blue": ["d2"], "red": ["c3", "b1"]}}'></div>
-    <div id="idea-0-details">
+    <div id="tooltip" class="tooltip"></div>
+    <div id="board1" style="width: 400px; float: left"></div>
+    <div class="idea" id="idea-0" data-selected="true" data-idea="0">
       <h1>Mobility</h1>
       <p>Mobile pieces have more useful squares they can move to. Mobility is denied by friendly pawns, friendly king and queen, and spaces that are controlled by enemy pawns.</p>
+      <p>In Stockfish, mobility affects score directly, and contributes to the king danger threshold.</p>
     </div>
-    <textarea id="engine-history" placeholder="engine-history"></textarea>
-    <textarea id="pgn-history" placeholder="pgn-history"></textarea>
-    <textarea id="fen-string" placeholder="fen-string" readonly></textarea>
+    <div class="idea" id="idea-1" data-selected="false" data-idea="1">
+      <h1>Outposts</h1>
+      <p>Outposts are the ideal place to put a knight, though a bishop can also work. An outpost square is defended by friendly pawns and can't be attacked by enemy pawns, even if they are pushed. This makes the piece extremely hard to dislodge, because you have to either attack the base of the pawn chain or make an equal trade.</p>
+      <p>In Stockfish, an outpost only scores points if a minor piece occupies or threatens to occupy it. It must also be on ranks 4, 5, or 6 to threaten squares without being fully in the thick of it.</p>
+    </div>
+    <textarea class="info-box" id="engine-history" placeholder="engine-history"></textarea>
+    <textarea class="info-box" id="pgn-history" placeholder="pgn-history"></textarea>
+    <textarea class="info-box" id="fen-string" placeholder="fen-string" readonly></textarea>
+    <textarea class="info-box" id="stockfish-json" placeholder="stockfish-json" readonly></textarea>
   </body>
 </html>

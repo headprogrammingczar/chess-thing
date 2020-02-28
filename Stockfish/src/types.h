@@ -464,6 +464,7 @@ constexpr bool is_ok(Move m) {
 // The evaluation components to factor out into detailed trace information
 enum IdeaType : int {
   IDEA_MOBILITY,
+  IDEA_MINOR_OUTPOST,
   IDEA_NB,
   IDEA_FIRST = 0
 };
