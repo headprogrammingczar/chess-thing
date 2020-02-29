@@ -465,6 +465,8 @@ constexpr bool is_ok(Move m) {
 enum IdeaType : int {
   IDEA_MOBILITY,
   IDEA_MINOR_OUTPOST,
+  IDEA_MINOR_BEHIND_PAWN,
+  IDEA_KING_PROTECTOR,
   IDEA_NB,
   IDEA_FIRST = 0
 };
