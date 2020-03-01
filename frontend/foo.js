@@ -57,6 +57,15 @@ index_to_square.forEach(function(val, index) {
   square_to_index[val] = index;
 });
 
+// some data stockfish returns isn't a term that's added into
+// the total score, but just something interesting to look at
+// these are the ideas that aren't full terms, so in some places
+// they can be handled correctly
+var sub_ideas = {
+  5: true,
+  6: true
+};
+
 // stockfish can't handle multiple queries at a time
 // and more complicated gui elements may need to test
 // multiple hypothetical positions in quick succession
@@ -142,9 +151,11 @@ function update(engine_moves, options = {}) {
     // when the state is updated from board drag-and-drop,
     // the board behaves weirdly when it's modified from within
     // the event handling logic, so allow the option to skip it
-    boardObject.position(chess.fen());
   }
-  fishQueue.push([engineHistoryDOM.val(), "eval"], stockfishOnMessage);
+  setTimeout(function() {
+    boardObject.position(chess.fen());
+    fishQueue.push([engineHistoryDOM.val(), "eval"], stockfishOnMessage);
+  }, 100);
   console.log("client position - "+chess.fen());
 }
 
@@ -188,22 +199,23 @@ function onMouseoverSquare(square, piece) {
   // highlight other squares
   index = square_to_index[square];
   data = fishData.ideas.white[focusedIdea][index];
-  if (data.mg != 0) {
-    boardDOM.find('.square-' + square).attr("data-color", "blue");
-    bitboard_to_squares(data.why).forEach(function(square) {
-      boardDOM.find('.square-' + square).attr("data-highlight", "red");
-    });
-  }
+  boardDOM.find('.square-' + square).attr("data-color", "blue");
+  bitboard_to_squares(data.why).forEach(function(square) {
+    boardDOM.find('.square-' + square).attr("data-highlight", "red");
+  });
 
   total_for_square = 0;
   // can't do regular forEach, but apparently this works...
   for (var idea in fishData.ideas.white) {
-    total_for_square += fishData.ideas.white[idea][index].mg;
+    // only add up the terms that contribute to a position's final score
+    if (!sub_ideas[idea]) {
+      total_for_square += fishData.ideas.white[idea][index].mg;
+    }
   }
 
   // update tooltip text
   tooltipDOM.css("display", "block");
-  tooltipDOM.html(`Score for ${square}<br>This idea: ${data.mg}<br>Total: ${total_for_square}`);
+  tooltipDOM.html(`Score for ${square}<br>This idea: ${data.mg}<br>Total: ${total_for_square.toFixed(2)}`);
 }
 
 function onDrop(source, target, piece, newPos, oldPos, orientation) {
@@ -274,6 +286,7 @@ $(document).ready(function() {
     $(event.delegateTarget).attr("data-selected", "true");
     focusedIdea = $(event.delegateTarget).attr("data-idea");
     onMouseoutSquare(undefined, undefined);
+    event.stopPropagation();
   });
 
   // initialize stockfish websocket

@@ -350,9 +350,34 @@ namespace {
                 score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
                                      * (1 + popcount(blocked & CenterFiles));
 
+                if (T) {
+                  // this measure has multiple terms that are useful to examine separately
+                  humanEval.ideas[Us][IDEA_BISHOP_PAWNS_TERM_SQUARES].squares[s].score = -(
+                    BishopPawns * pos.pawns_on_same_color_squares(Us, s));
+                  humanEval.ideas[Us][IDEA_BISHOP_PAWNS_TERM_SQUARES].squares[s].why =
+                    (pos.pieces(Us, PAWN) & ((DarkSquares & s) ? DarkSquares : ~DarkSquares));
+
+                  humanEval.ideas[Us][IDEA_BISHOP_PAWNS_TERM_CENTER].squares[s].score =
+                    make_score(-1 - popcount(blocked & CenterFiles), -1 - popcount(blocked & CenterFiles));
+                  humanEval.ideas[Us][IDEA_BISHOP_PAWNS_TERM_CENTER].squares[s].why =
+                    ((blocked & CenterFiles) | shift<Up>(blocked & CenterFiles));
+
+                  humanEval.ideas[Us][IDEA_BISHOP_PAWNS].squares[s].score = -(
+                    BishopPawns * pos.pawns_on_same_color_squares(Us, s)
+                                * (1 + popcount(blocked & CenterFiles)));
+                  humanEval.ideas[Us][IDEA_BISHOP_PAWNS].squares[s].why =
+                    (pos.pieces(Us, PAWN) & ((DarkSquares & s) ? DarkSquares : ~DarkSquares))
+                    | ((blocked & CenterFiles) | shift<Up>(blocked & CenterFiles));
+                }
+
                 // Bonus for bishop on a long diagonal which can "see" both center squares
-                if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
-                    score += LongDiagonalBishop;
+                if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center)) {
+                  score += LongDiagonalBishop;
+                  if (T) {
+                    humanEval.ideas[Us][IDEA_BISHOP_ATTACKS_CENTER].squares[s].score = LongDiagonalBishop;
+                    humanEval.ideas[Us][IDEA_BISHOP_ATTACKS_CENTER].squares[s].why = attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center;
+                  }
+                }
             }
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly

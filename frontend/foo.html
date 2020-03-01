@@ -42,7 +42,7 @@
         background-color: #cf8080;
       }
       .info-box {
-        width: 350px;
+        width: 24%;
         height: 400px;
       }
       .tooltip {
@@ -59,32 +59,74 @@
       .idea p {
         display: none;
       }
+      .sub-idea {
+        margin-left: 20px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 400px auto;
+        grid-template-areas:
+          "board ideas"
+          "textareas textareas";
+      }
+      #board1 {
+        grid-area: board;
+      }
+      #ideas {
+        grid-area: ideas;
+      }
+      #textareas {
+        grid-area: textareas;
+      }
     </style>
   </head>
   <body>
     <div id="tooltip" class="tooltip"></div>
-    <div id="board1" style="width: 400px; float: left"></div>
-    <div class="idea" id="idea-0" data-selected="true" data-idea="0">
-      <h3>Mobility</h3>
-      <p>Mobile pieces have more useful squares they can move to. Mobility is denied by friendly pawns, friendly king and queen, and spaces that are controlled by enemy pawns.</p>
-      <p>In Stockfish, mobility affects score directly, and contributes to the king danger threshold.</p>
+    <div class="grid">
+      <div id="board1"></div>
+      <div id="ideas">
+        <div class="idea" data-selected="true" data-idea="0">
+          <h3>Mobility</h3>
+          <p>Mobile pieces have more useful squares they can move to. Mobility is denied by friendly pawns, friendly king and queen, and spaces that are controlled by enemy pawns.</p>
+          <p>In Stockfish, mobility affects score directly, and contributes to the king danger threshold.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="1">
+          <h3>Outposts</h3>
+          <p>Outposts are the ideal place to put a knight, though a bishop can also work. An outpost square is defended by friendly pawns and can't be attacked by enemy pawns, even if they are pushed. This makes the piece extremely hard to dislodge, because you have to either attack the base of the pawn chain or make an equal trade.</p>
+          <p>In Stockfish, an outpost only scores points if a minor piece occupies or threatens to occupy it. It must also be on ranks 4, 5, or 6 to threaten squares without being fully in the thick of it.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="2">
+          <h3>Minor Pieces Behind Pawns</h3>
+          <p>Minor pieces directly behind pawns are scored as slightly better. This isn't a very useful metric though, and testing indicates it's worth -0.35 ELO in practice.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="3">
+          <h3>Minor Piece King Protection</h3>
+          <p>Minor pieces are slightly better near the king, where they can be used for defense.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="4">
+          <h3>Blocked Bishops</h3>
+          <p>Bishops become much worse when blocked in by their own pawns.</p>
+          <div class="idea sub-idea" data-selected="false" data-idea="5">
+            <h4>By Pawns</h4>
+            <p>A bishop is blocked by friendly pawns on same-color squares.</p>
+          </div>
+          <div class="idea sub-idea" data-selected="false" data-idea="6">
+            <h4>By Closed Position</h4>
+            <p>A bishop is also blocked by friendly c/d/e/f file pawns that cannot advance, regardless of what square they are on, because closed positions limit the bishop's influence on the other side of the board.</p>
+          </div>
+        </div>
+        <div class="idea" data-selected="false" data-idea="7">
+          <h3>Bishops On Long Diagonals</h3>
+          <p>Bishops on long diagonals control important squares in the center and near a castled king. This is ideally done with a fianchettoed bishop, which can project this control from a well-defended position.</p>
+          <p>In Stockfish, this advantage is measured based on attacking both central squares.</p>
+        </div>
+      </div>
+      <div id="textareas">
+        <textarea class="info-box" id="engine-history" placeholder="engine-history"></textarea>
+        <textarea class="info-box" id="pgn-history" placeholder="pgn-history"></textarea>
+        <textarea class="info-box" id="fen-string" placeholder="fen-string" readonly></textarea>
+        <textarea class="info-box" id="stockfish-json" placeholder="stockfish-json" readonly></textarea>
+      </div>
     </div>
-    <div class="idea" id="idea-1" data-selected="false" data-idea="1">
-      <h3>Outposts</h3>
-      <p>Outposts are the ideal place to put a knight, though a bishop can also work. An outpost square is defended by friendly pawns and can't be attacked by enemy pawns, even if they are pushed. This makes the piece extremely hard to dislodge, because you have to either attack the base of the pawn chain or make an equal trade.</p>
-      <p>In Stockfish, an outpost only scores points if a minor piece occupies or threatens to occupy it. It must also be on ranks 4, 5, or 6 to threaten squares without being fully in the thick of it.</p>
-    </div>
-    <div class="idea" id="idea-2" data-selected="false" data-idea="2">
-      <h3>Minor Pieces Behind Pawns</h3>
-      <p>Minor pieces directly behind pawns are scored as slightly better. This isn't a very useful metric though, and testing indicates it's worth -0.35 ELO in practice.</p>
-    </div>
-    <div class="idea" id="idea-3" data-selected="false" data-idea="3">
-      <h3>Minor Piece King Protection</h3>
-      <p>Minor pieces are slightly better near the king, where they can be used for defense.</p>
-    </div>
-    <textarea class="info-box" id="engine-history" placeholder="engine-history"></textarea>
-    <textarea class="info-box" id="pgn-history" placeholder="pgn-history"></textarea>
-    <textarea class="info-box" id="fen-string" placeholder="fen-string" readonly></textarea>
-    <textarea class="info-box" id="stockfish-json" placeholder="stockfish-json" readonly></textarea>
   </body>
 </html>
