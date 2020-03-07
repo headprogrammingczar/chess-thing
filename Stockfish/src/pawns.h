@@ -64,6 +64,7 @@ struct Entry {
 typedef HashTable<Entry, 131072> Table;
 
 Entry* probe(const Position& pos);
+void trace_probe(const Position& pos, HumanEval* humanEval);
 
 } // namespace Pawns
 

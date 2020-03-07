@@ -463,6 +463,7 @@ constexpr bool is_ok(Move m) {
 
 // The evaluation components to factor out into detailed trace information
 enum IdeaType : int {
+  IDEA_MATERIAL,
   IDEA_MOBILITY,
   IDEA_MINOR_OUTPOST,
   IDEA_MINOR_BEHIND_PAWN,
@@ -471,6 +472,8 @@ enum IdeaType : int {
   IDEA_BISHOP_PAWNS_TERM_SQUARES,
   IDEA_BISHOP_PAWNS_TERM_CENTER,
   IDEA_BISHOP_ATTACKS_CENTER,
+  IDEA_PAWN_SUPPORT,
+  IDEA_PAWN_ISOLATED,
   IDEA_NB,
   IDEA_FIRST = 0
 };

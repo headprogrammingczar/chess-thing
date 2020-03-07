@@ -62,8 +62,8 @@ index_to_square.forEach(function(val, index) {
 // these are the ideas that aren't full terms, so in some places
 // they can be handled correctly
 var sub_ideas = {
-  5: true,
-  6: true
+  6: true,
+  7: true
 };
 
 // stockfish can't handle multiple queries at a time

@@ -86,39 +86,53 @@
       <div id="board1"></div>
       <div id="ideas">
         <div class="idea" data-selected="true" data-idea="0">
+          <h3>Material</h3>
+          <p>The base score that each piece is worth. Generally minor pieces are worth 3 pawns, rooks are worth 5 pawns, and queens are worth 8 pawns.</p>
+          <p>In Stockfish, this value is modified by where each piece is located, generally with the center squares being worth more to occupy.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="1">
           <h3>Mobility</h3>
           <p>Mobile pieces have more useful squares they can move to. Mobility is denied by friendly pawns, friendly king and queen, and spaces that are controlled by enemy pawns.</p>
           <p>In Stockfish, mobility affects score directly, and contributes to the king danger threshold.</p>
         </div>
-        <div class="idea" data-selected="false" data-idea="1">
+        <div class="idea" data-selected="false" data-idea="2">
           <h3>Outposts</h3>
           <p>Outposts are the ideal place to put a knight, though a bishop can also work. An outpost square is defended by friendly pawns and can't be attacked by enemy pawns, even if they are pushed. This makes the piece extremely hard to dislodge, because you have to either attack the base of the pawn chain or make an equal trade.</p>
           <p>In Stockfish, an outpost only scores points if a minor piece occupies or threatens to occupy it. It must also be on ranks 4, 5, or 6 to threaten squares without being fully in the thick of it.</p>
         </div>
-        <div class="idea" data-selected="false" data-idea="2">
+        <div class="idea" data-selected="false" data-idea="3">
           <h3>Minor Pieces Behind Pawns</h3>
           <p>Minor pieces directly behind pawns are scored as slightly better. This isn't a very useful metric though, and testing indicates it's worth -0.35 ELO in practice.</p>
         </div>
-        <div class="idea" data-selected="false" data-idea="3">
+        <div class="idea" data-selected="false" data-idea="4">
           <h3>Minor Piece King Protection</h3>
           <p>Minor pieces are slightly better near the king, where they can be used for defense.</p>
         </div>
-        <div class="idea" data-selected="false" data-idea="4">
+        <div class="idea" data-selected="false" data-idea="5">
           <h3>Blocked Bishops</h3>
           <p>Bishops become much worse when blocked in by their own pawns.</p>
-          <div class="idea sub-idea" data-selected="false" data-idea="5">
+          <div class="idea sub-idea" data-selected="false" data-idea="6">
             <h4>By Pawns</h4>
             <p>A bishop is blocked by friendly pawns on same-color squares.</p>
           </div>
-          <div class="idea sub-idea" data-selected="false" data-idea="6">
+          <div class="idea sub-idea" data-selected="false" data-idea="7">
             <h4>By Closed Position</h4>
             <p>A bishop is also blocked by friendly c/d/e/f file pawns that cannot advance, regardless of what square they are on, because closed positions limit the bishop's influence on the other side of the board.</p>
           </div>
         </div>
-        <div class="idea" data-selected="false" data-idea="7">
+        <div class="idea" data-selected="false" data-idea="8">
           <h3>Bishops On Long Diagonals</h3>
           <p>Bishops on long diagonals control important squares in the center and near a castled king. This is ideally done with a fianchettoed bishop, which can project this control from a well-defended position.</p>
           <p>In Stockfish, this advantage is measured based on attacking both central squares.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="9">
+          <h3>Supported Pawns</h3>
+          <p>Pawns that are supported by a pawn chain or part of a phalanx are better than overextended or isolated pawns.</p>
+          <p>Stockfish considers phalanxes to be slightly better than pawn chains.</p>
+        </div>
+        <div class="idea" data-selected="false" data-idea="10">
+          <h3>Isolated Pawns</h3>
+          <p>Isolated pawns have no friendly pawns in adjacent files, making them hard to defend.</p>
         </div>
       </div>
       <div id="textareas">

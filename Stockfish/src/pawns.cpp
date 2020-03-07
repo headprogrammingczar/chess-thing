@@ -64,8 +64,10 @@ namespace {
   #undef S
   #undef V
 
-  template<Color Us>
-  Score evaluate(const Position& pos, Pawns::Entry* e) {
+  enum Tracing { NO_TRACE, TRACE };
+
+  template<Tracing T, Color Us>
+  Score evaluate(const Position& pos, Pawns::Entry* e, HumanEval* humanEval) {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
@@ -132,10 +134,19 @@ namespace {
                    + 17 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
+            if (T) {
+              humanEval->ideas[Us][IDEA_PAWN_SUPPORT].squares[s].score = make_score(v, v * (r - 2) / 4);
+              humanEval->ideas[Us][IDEA_PAWN_SUPPORT].squares[s].why = (support | phalanx);
+            }
         }
 
-        else if (!neighbours)
+        else if (!neighbours) {
             score -= Isolated + WeakUnopposed * int(!opposed);
+            if (T) {
+              humanEval->ideas[Us][IDEA_PAWN_ISOLATED].squares[s].score = make_score(-(Isolated + WeakUnopposed * int(!opposed)), -(Isolated + WeakUnopposed * int(!opposed)));
+              humanEval->ideas[Us][IDEA_PAWN_ISOLATED].squares[s].why = square_bb(s);
+            }
+        }
 
         else if (backward)
             score -= Backward + WeakUnopposed * int(!opposed);
@@ -171,12 +182,20 @@ Entry* probe(const Position& pos) {
       return e;
 
   e->key = key;
-  e->scores[WHITE] = evaluate<WHITE>(pos, e);
-  e->scores[BLACK] = evaluate<BLACK>(pos, e);
+  e->scores[WHITE] = evaluate<NO_TRACE, WHITE>(pos, e, nullptr);
+  e->scores[BLACK] = evaluate<NO_TRACE, BLACK>(pos, e, nullptr);
 
   return e;
 }
 
+// performs the same calculations as Pawns::probe() without hashing
+// and writes the score breakdown to humanEval instead of returning
+// the accumulated scores
+void trace_probe(const Position& pos, HumanEval* humanEval) {
+  Entry e = {};
+  evaluate<TRACE, WHITE>(pos, &e, humanEval);
+  evaluate<TRACE, BLACK>(pos, &e, humanEval);
+}
 
 /// Entry::evaluate_shelter() calculates the shelter bonus and the storm
 /// penalty for a king, looking at the king file and the two closest files.

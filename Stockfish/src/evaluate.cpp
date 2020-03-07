@@ -835,6 +835,26 @@ namespace {
     // Probe the material hash table
     me = Material::probe(pos);
 
+    if (T) {
+      for (Color c : {WHITE, BLACK}) {
+        const Square* pieceSquares[] = {
+          nullptr,
+          pos.squares<PAWN>(c),
+          pos.squares<KNIGHT>(c),
+          pos.squares<BISHOP>(c),
+          pos.squares<ROOK>(c),
+          pos.squares<QUEEN>(c),
+        };
+        for (PieceType pt : {PAWN, KNIGHT, BISHOP, ROOK, QUEEN}) {
+          const Square* pl = pieceSquares[pt];
+          for (Square s = *pl; s != SQ_NONE; s = *++pl) {
+            humanEval.ideas[c][IDEA_MATERIAL].squares[s].score = PSQT::psq[pt][s];
+            humanEval.ideas[c][IDEA_MATERIAL].squares[s].why = square_bb(s);
+          }
+        }
+      }
+    }
+
     // If we have a specialized evaluation function for the current material
     // configuration, call it and return.
     if (me->specialized_eval_exists())
@@ -847,6 +867,9 @@ namespace {
 
     // Probe the pawn hash table
     pe = Pawns::probe(pos);
+    if (T) {
+      Pawns::trace_probe(pos, &humanEval);
+    }
     score += pe->pawn_score(WHITE) - pe->pawn_score(BLACK);
 
     // Early exit if score is high
@@ -949,7 +972,7 @@ std::string Eval::trace(const Position& pos) {
   for (Color color : {WHITE, BLACK}) {
     ss << "\"" << (color == WHITE ? "white" : "black") << "\": {";
     for (int idea = IDEA_FIRST; idea < IDEA_NB; idea++) {
-      ss << "\"" << idea << "\": [";
+      ss << "\"" << std::dec << idea << "\": [";
       for (int square = SQ_A1; square < SQUARE_NB; square++) {
         SquareIdea sq = humanEval.ideas[color][idea].squares[square];
         ss << "{\"mg\": " << to_cp(mg_value(sq.score))
